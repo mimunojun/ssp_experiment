@@ -12,7 +12,7 @@ int main(int argc, char *argv[]){
   char path[] = "wave/";
   // char outputpath_f[] = "output/csv/";
   // char outputpath_k[] = "output/csv/";
-
+ 
   strcat(path, argv[1]);
   wave_read_16bit_mono(&pcm, path);
 
