@@ -160,6 +160,41 @@ int main(int argc, char *argv[]){
   }
   fclose(fp);
 
+  for(k=0; k<N; k++){
+    x_norm[k] = sqrt(x_real[k]*x_real[k] + x_imag[k]*x_imag[k]);
+    // printf("X(%d) = %f+j%f\n", k, x_real[k], x_imag[k]);
+  }
+
+  printf("f");
+  fp = fopen("spectowave2.csv", "w");
+  fprintf(fp, "f, X_norm\n");
+  for(k=0; k<N; k++){
+    fprintf(fp, "%f, %f\n ", (float)1/8000*k, x_norm[k]);
+  }
+  fclose(fp);
+
+
+
+  for(k=N/10; k<9*N/10; k++){
+    x_real[k] = 0;
+    x_imag[k] = 0;
+  }
+  
+  IFFT(x_real, x_imag, N/2);
+
+  for(k=0; k<N; k++){
+    x_norm[k] = sqrt(x_real[k]*x_real[k] + x_imag[k]*x_imag[k]);
+    // printf("X(%d) = %f+j%f\n", k, x_real[k], x_imag[k]);
+  }
+
+  printf("f");
+  fp = fopen("spectowave.csv", "w");
+  fprintf(fp, "f, X_norm\n");
+  for(k=0; k<N/2; k++){
+    fprintf(fp, "%f, %f\n ", (float)1/8000*k, x_real[k]);
+  }
+  fclose(fp);
+
 
   // strcat(outputpath_f, argv[1]);
   // strcat(outputpath_f, ".f.csv");
