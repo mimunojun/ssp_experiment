@@ -1,7 +1,7 @@
 import pandas as pd
 import matplotlib.pyplot as plt
 
-data_w = pd.read_csv('w.csv',encoding = 'UTF8')
+data_w = pd.read_csv('testing4.csv',encoding = 'UTF8')
 data_f = pd.read_csv('f.csv',encoding = 'UTF8')
 data_fdb = pd.read_csv('fdb.csv',encoding = 'UTF8')
 data_k = pd.read_csv('k.csv',encoding = 'UTF8')
@@ -31,10 +31,4 @@ plt.plot(data_ftow2.iloc[:,0], data_ftow2.iloc[:,1])
 fig_ftow = plt.figure()
 plt.plot(data_ftow.iloc[:,0], data_ftow.iloc[:,1])
 
-fig_w.savefig("output/png/outw.png")
-fig_f.savefig("output/png/outf.png")
-fig_fdb.savefig("output/png/outfdb.png")
-fig_k.savefig("output/png/outk.png")
-fig_invk.savefig("output/png/outinvk.png")
-fig_ftow2.savefig("output/png/ftow2.png")
-fig_ftow.savefig("output/png/ftow.png")
+fig_w.savefig("output/png/outw2.png")

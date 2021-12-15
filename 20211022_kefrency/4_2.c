@@ -59,22 +59,65 @@ int main(int argc, char *argv[]){
   fdata.length = data_len;
   fdata.s = calloc(fdata.length, sizeof(double));
 
-  while(c*N/2 + N < data_len){
+  for(c=0; c*N/2 + N < data_len; c++){
     
     X_DATA xdata;
-    c++;
-    printf("hi %d,%d,%d,%d,\n",c,N,c*N/2 + N, data_len);
+    // printf("hi %d,%d,%d,%d,\n",c,N,c*N/2 + N, data_len);
     data_prep(&xdata, N);
 
 
     for(n=0; n<N; n++){
       xdata.x_real[n] = pcm.s[c*N/2+n];
       xdata.x_imag[n] = 0.0;
-    }
-
-    for(n=0; n<N; n++){
       xdata.x_real[n] = xdata.x_real[n] * h_window[n];
     }
+
+    FFT(xdata.x_real, xdata.x_imag, N);
+
+    for(n=N-1; n>N/2+32; n--){
+      xdata.x_real[n] = xdata.x_real[n-32];
+      xdata.x_imag[n] = xdata.x_imag[n-32];
+    }
+    for(n=0; n<N/2-32; n++){
+      xdata.x_real[n] = xdata.x_real[n+32];
+      xdata.x_imag[n] = xdata.x_imag[n+32];
+    }
+    for(n=7*N/16; n<9*N/16; n++){
+      xdata.x_real[n] = 0.0;
+      xdata.x_imag[n] = 0.0;
+    }
+
+    // for(n=N/2; n>32; n--){ //shift+500hz
+    //   xdata.x_real[n] = xdata.x_real[n-32];
+    //   xdata.x_imag[n] = xdata.x_imag[n-32];
+    // }
+    // for(n=N/2; n<N-32; n++){
+    //   xdata.x_real[n] = xdata.x_real[n+32];
+    //   xdata.x_imag[n] = xdata.x_imag[n+32];
+    // }
+    // for(n=0; n<1*N/16; n++){
+    //   xdata.x_real[n] = 0.0;
+    //   xdata.x_imag[n] = 0.0;
+    // }
+    // for(n=15*N/16; n<N/16; n++){
+    //   xdata.x_real[n] = 0.0;
+    //   xdata.x_imag[n] = 0.0;
+    // }
+
+    // for(n=N/4; n<N*3/4; n++){ //lowpass
+    //   xdata.x_real[n] = 0.0;
+    //   xdata.x_imag[n] = 0.0;
+    // }
+
+
+    fp = fopen("testing4.csv", "w");
+    fprintf(fp, "t, X_wave\n");
+    for(k=0; k<N; k++){
+      fprintf(fp, "%f, %f\n ", (float)8000/(N)*k, xdata.x_real[k]);
+    }
+    fclose(fp);
+
+    IFFT(xdata.x_real, xdata.x_imag, N);
 
     for(n=0; n<N; n++){
       fdata.s[c*N/2 + n] += xdata.x_real[n];
@@ -82,12 +125,15 @@ int main(int argc, char *argv[]){
 
     data_free(xdata);
   }
-
-  wave_write_16bit_mono(&fdata, "test.wav");
-  free(fdata.s);
+  
   free(h_window);
   free(h_window2);
   free(h_window4);
+  free(pcm.s);
+  
+  wave_write_16bit_mono(&fdata, "testing4.wav");
+  free(fdata.s);
+  printf("exit\n");
 
   // //波形x窓関数
   // for(n=0; n<N; n++){
@@ -234,7 +280,7 @@ int main(int argc, char *argv[]){
   // // strcat(outputpath_k, ".k.csv");
 
 
-  free(pcm.s);
+  
   // free(x_real);
   // free(x_imag);
   // free(x_norm);

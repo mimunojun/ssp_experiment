@@ -1,0 +1,3 @@
+12.03
+0<n<N/8, 7/8*N<n<N cut (HIPASS) testing3.wav
+N/4<n<3*N/4 cut (LOWPASS) testing4.wav
