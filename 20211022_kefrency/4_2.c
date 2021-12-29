@@ -59,7 +59,7 @@ int main(int argc, char *argv[]){
   fdata.length = data_len;
   fdata.s = calloc(fdata.length, sizeof(double));
 
-  for(c=0; c*N/2 + N < data_len; c++){
+  // for(c=0; c*N/2 + N < data_len; c++){
     
     X_DATA xdata;
     // printf("hi %d,%d,%d,%d,\n",c,N,c*N/2 + N, data_len);
@@ -74,18 +74,18 @@ int main(int argc, char *argv[]){
 
     FFT(xdata.x_real, xdata.x_imag, N);
 
-    for(n=N-1; n>N/2+32; n--){
-      xdata.x_real[n] = xdata.x_real[n-32];
-      xdata.x_imag[n] = xdata.x_imag[n-32];
-    }
-    for(n=0; n<N/2-32; n++){
-      xdata.x_real[n] = xdata.x_real[n+32];
-      xdata.x_imag[n] = xdata.x_imag[n+32];
-    }
-    for(n=7*N/16; n<9*N/16; n++){
-      xdata.x_real[n] = 0.0;
-      xdata.x_imag[n] = 0.0;
-    }
+    // for(n=N-1; n>N/2+32; n--){
+    //   xdata.x_real[n] = xdata.x_real[n-32];
+    //   xdata.x_imag[n] = xdata.x_imag[n-32];
+    // }
+    // for(n=0; n<N/2-32; n++){
+    //   xdata.x_real[n] = xdata.x_real[n+32];
+    //   xdata.x_imag[n] = xdata.x_imag[n+32];
+    // }
+    // for(n=7*N/16; n<9*N/16; n++){
+    //   xdata.x_real[n] = 0.0;
+    //   xdata.x_imag[n] = 0.0;
+    // }
 
     // for(n=N/2; n>32; n--){ //shift+500hz
     //   xdata.x_real[n] = xdata.x_real[n-32];
@@ -109,11 +109,96 @@ int main(int argc, char *argv[]){
     //   xdata.x_imag[n] = 0.0;
     // }
 
+    double *dif, *ddif, *dif_2, *dif_4, *wave;
+    int *peaks;
+    int d = 0;
+    dif = calloc(N/2-1, sizeof(double));
+    ddif = calloc(N/2-2, sizeof(double));
+    x_norm_db = calloc(N/2, sizeof(double));
+    dif_2 = calloc(N, sizeof(double));
+    dif_4 = calloc(N*2, sizeof(double));
+    wave = calloc(N/2, sizeof(double));
+    peaks = calloc(500, sizeof(int));
+
+    for(n=0; n<N/2; n++){
+      x_norm_db[n] = 20*log10(sqrt(xdata.x_real[n]*xdata.x_real[n] + xdata.x_imag[n]*xdata.x_imag[n])/100);
+    }
+
+    for(n=3; n<N/2; n++){
+      dif[n-3] = x_norm_db[n] - x_norm_db[n-3];
+    }
+
+    for(n=0; n<N; n++){
+      if(n%2 == 0){
+        dif_2[n] = dif[n/2];
+      }else{
+        dif_2[n] = (dif[(n+1)/2 - 1] + dif[(n+1)/2])/2;
+      }
+    }
+
+    for(n=0; n<2*N; n++){
+      if(n%2 == 0){
+        dif_4[n] = dif_2[n/2];
+      }else{
+        dif_4[n] = (dif_2[(n+1)/2 - 1] + dif_2[(n+1)/2])/2;
+      }
+    }
+
+    for(n=0; n<2*N; n++){
+      if((dif_4[n] < 7 && dif_4[n] > -7) && (dif_4[n+1] > 7 || dif_4[n+1] < -7) && (dif_4[n] - dif_4[n-1] < 0)){
+        peaks[d] = n/4 + 1;
+        //printf("%d, %d\n", d, peaks[d]);
+        d++;
+      }
+    }
+
+    k = 0;
+    for(n=0; n<N/2; n++){
+      if(n == peaks[k]){
+        wave[n] = 15;
+        k = k+1;
+      }else{
+        int mid = (peaks[k-1] + peaks[k])/2;
+        //printf("n, mid, %d, %d\n", n, mid);
+        int dur = (mid - peaks[k-1]);
+        int dur2 = (peaks[k]- mid);
+        int j = n - peaks[k-1];
+        int j2 = n - mid;
+        if(n == mid){
+          wave[n] = -15;
+          //printf("hi\n");
+        }else if(n < mid){
+          wave[n] = 15 + (j/(float)dur) * (-30);
+        }else if(n > mid){
+          wave[n] = -15 + (j2/(float)dur2) * (30);
+        }
+      }
+      
+    }
+
+
+
+
 
     fp = fopen("testing4.csv", "w");
     fprintf(fp, "t, X_wave\n");
     for(k=0; k<N; k++){
+      
       fprintf(fp, "%f, %f\n ", (float)8000/(N)*k, xdata.x_real[k]);
+    }
+    fclose(fp);
+
+    fp = fopen("testing5.csv", "w");
+    fprintf(fp, "t, X_wave\n");
+    for(k=0; k<N/2; k++){
+      fprintf(fp, "%d, %f\n ", k, wave[k]);
+    }
+    fclose(fp);
+
+    fp = fopen("testing6.csv", "w");
+    fprintf(fp, "t, X_wave\n");
+    for(k=0; k<N/2; k++){
+      fprintf(fp, "%d, %d\n ", k, peaks[k]);
     }
     fclose(fp);
 
@@ -124,7 +209,7 @@ int main(int argc, char *argv[]){
     }
 
     data_free(xdata);
-  }
+  // }
   
   free(h_window);
   free(h_window2);
