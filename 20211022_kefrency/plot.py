@@ -1,7 +1,7 @@
 import pandas as pd
 import matplotlib.pyplot as plt
 
-data_w = pd.read_csv('testing5.csv',encoding = 'UTF8')
+data_w = pd.read_csv('testing_1oct.csv',encoding = 'UTF8')
 data_w6 = pd.read_csv('testing6.csv',encoding = 'UTF8')
 data_f = pd.read_csv('f.csv',encoding = 'UTF8')
 data_fdb = pd.read_csv('fdb.csv',encoding = 'UTF8')
@@ -12,8 +12,7 @@ data_ftow = pd.read_csv('spectowave.csv',encoding = 'UTF8')
 
 fig_w = plt.figure()
 plt.plot(data_w.iloc[:,0], data_w.iloc[:,1])
-for i in range(len(data_w6.iloc[:,0])):
-    plt.vlines(data_w6.iloc[i,1], -20,1, colors='red')
+
 plt.show()
 
 
