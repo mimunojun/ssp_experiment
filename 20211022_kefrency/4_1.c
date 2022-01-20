@@ -140,7 +140,7 @@ int main(int argc, char *argv[]){
     x_invimag[n] = kx_imag[n];
   }
 
-  for(n=12; n<kN/2; n++){
+  for(n=10; n<kN/2; n++){
     x_invreal[n] = 0;
     x_invimag[n] = 0;
   }

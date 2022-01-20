@@ -13,7 +13,6 @@ data_ftow = pd.read_csv('spectowave.csv',encoding = 'UTF8')
 fig_w = plt.figure()
 plt.plot(data_w.iloc[:,0], data_w.iloc[:,1])
 
-plt.show()
 
 
 fig_f = plt.figure()
@@ -36,4 +35,4 @@ plt.plot(data_ftow2.iloc[:,0], data_ftow2.iloc[:,1])
 fig_ftow = plt.figure()
 plt.plot(data_ftow.iloc[:,0], data_ftow.iloc[:,1])
 
-fig_w.savefig("output/png/outw2.png")
+fig_invk.savefig("output/png/outw2.png")
